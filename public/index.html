@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Web Clone</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --whatsapp-green: #25D366;
+      --whatsapp-dark-green: #128C7E;
+      --whatsapp-light-green: #DCF8C6;
+      --whatsapp-gray: #F0F0F0;
+      --whatsapp-dark-gray: #E5E5E5;
+    }
+
+    body {
+      background-color: #f0f2f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .whatsapp-container {
+      height: 100vh;
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar {
+      background-color: white;
+      border-right: 1px solid var(--whatsapp-dark-gray);
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      background-color: var(--whatsapp-gray);
+      padding: 15px;
+      border-bottom: 1px solid var(--whatsapp-dark-gray);
+    }
+
+    .search-container {
+      padding: 10px;
+      background-color: white;
+      border-bottom: 1px solid var(--whatsapp-dark-gray);
+    }
+
+    .search-box {
+      background-color: var(--whatsapp-gray);
+      border: none;
+      border-radius: 20px;
+      padding: 8px 15px 8px 40px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #999;
+    }
+
+    .chat-list {
+      height: calc(100vh - 140px);
+      overflow-y: auto;
+    }
+
+    .chat-item {
+      padding: 12px 15px;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .chat-item:hover {
+      background-color: #f5f5f5;
+    }
+
+    .chat-item.active {
+      background-color: var(--whatsapp-dark-gray);
+    }
+
+    .chat-area {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="%23e5ddd5" opacity="0.3"/></pattern></defs><rect width="100" height="100" fill="url(%23pattern)"/></svg>');
+    }
+
+    .chat-header {
+      background-color: var(--whatsapp-gray);
+      padding: 15px;
+      border-bottom: 1px solid var(--whatsapp-dark-gray);
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      max-height: calc(100vh - 140px);
+    }
+
+    .message {
+      margin-bottom: 15px;
+      display: flex;
+    }
+
+    .message.sent {
+      justify-content: flex-end;
+    }
+
+    .message.received {
+      justify-content: flex-start;
+    }
+
+    .message-bubble {
+      max-width: 70%;
+      padding: 8px 12px;
+      border-radius: 8px;
+      position: relative;
+      word-wrap: break-word;
+    }
+
+    .message.sent .message-bubble {
+      background-color: var(--whatsapp-light-green);
+      border-bottom-right-radius: 2px;
+    }
+
+    .message.received .message-bubble {
+      background-color: white;
+      border-bottom-left-radius: 2px;
+    }
+
+    .message-time {
+      font-size: 11px;
+      color: #999;
+      margin-top: 5px;
+      text-align: right;
+    }
+
+    .message-input-container {
+      background-color: var(--whatsapp-gray);
+      padding: 10px 15px;
+      border-top: 1px solid var(--whatsapp-dark-gray);
+    }
+
+    .message-input {
+      border: none;
+      border-radius: 20px;
+      padding: 10px 15px;
+      flex: 1;
+      resize: none;
+      min-height: 40px;
+      max-height: 120px;
+    }
+
+    .message-input:focus {
+      outline: none;
+      box-shadow: none;
+    }
+
+    .send-btn,
+    .attachment-btn,
+    .emoji-btn {
+      background-color: var(--whatsapp-green);
+      border: none;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      color: white;
+      margin-left: 8px;
+      transition: background-color 0.2s;
+    }
+
+    .attachment-btn,
+    .emoji-btn {
+      background-color: transparent;
+      color: #666;
+    }
+
+    .attachment-btn:hover,
+    .emoji-btn:hover {
+      background-color: #f0f0f0;
+      color: #333;
+    }
+
+    .send-btn:hover {
+      background-color: var(--whatsapp-dark-green);
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+    }
+
+    .online-status {
+      width: 12px;
+      height: 12px;
+      background-color: var(--whatsapp-green);
+      border-radius: 50%;
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      border: 2px solid white;
+    }
+
+    .offline-status {
+      width: 12px;
+      height: 12px;
+      background-color: grey;
+      border-radius: 50%;
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      border: 2px solid white;
+    }
+
+    .welcome-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f8f9fa;
+      color: #666;
+    }
+
+    .typing-indicator {
+      display: none;
+      color: var(--whatsapp-green);
+      font-style: italic;
+      font-size: 12px;
+    }
+
+    .truncate {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+      display: inline-block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container-fluid p-0">
+    <div class="row whatsapp-container">
+      <!-- Sidebar -->
+      <div class="col-md-4 sidebar">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            <div class="avatar me-3">
+              <i class="fas fa-user"></i>
+            </div>
+            <h6 class="mb-0" id="username">Username</h6>
+          </div>
+          <div>
+            <button class="btn btn-link text-muted p-1 me-2">
+              <i class="fas fa-circle-notch"></i>
+            </button>
+            <button class="btn btn-link text-muted p-1 me-2">
+              <i class="fas fa-comment-alt"></i>
+            </button>
+            <button class="btn btn-link text-muted p-1">
+              <i class="fas fa-ellipsis-v"></i>
+            </button>
+            <button class="btn btn-link text-muted p-1 me-2" title="logout" onclick="logout()">
+              <i class="fas fa-arrow-right-from-bracket"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Search -->
+        <div class="search-container">
+          <div class="position-relative">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="form-control search-box" placeholder="Search or start new chat">
+          </div>
+        </div>
+
+        <!-- Chat List -->
+        <div class="chat-list" id="chat-list">
+          <!-- <div class="chat-item" onclick="selectChat(this, 'Team Group')">
+            <div class="d-flex">
+              <div class="position-relative me-3">
+                <div class="avatar">
+                  <i class="fas fa-users"></i>
+                </div>
+              </div>
+              <div class="flex-grow-1">
+                <div class="d-flex justify-content-between">
+                  <h6 class="mb-1">Team Group</h6>
+                  <small class="text-muted">10:15 AM</small>
+                </div>
+                <p class="mb-0 text-muted small">Alice: Great work everyone!</p>
+              </div>
+            </div>
+          </div> -->
+        </div>
+      </div>
+
+      <!-- Chat Area -->
+      <div class="col-md-8 chat-area" id="chatArea">
+        <!-- Welcome Screen -->
+        <div class="welcome-screen" id="welcomeScreen">
+          <div class="text-center">
+            <i class="fab fa-whatsapp fa-5x text-success mb-4"></i>
+            <h3>WhatsApp Web</h3>
+            <p class="text-muted">Send and receive messages without keeping your phone online.</p>
+            <p class="text-muted small">Select a chat to start messaging</p>
+          </div>
+        </div>
+
+        <!-- Chat Header -->
+        <div class="chat-header d-none" id="chatHeader">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+              <div class="position-relative me-3">
+                <div class="avatar">
+                  <i class="fas fa-user"></i>
+                </div>
+                <div id="icon-header-status" class="online-status"></div>
+              </div>
+              <div>
+                <h6 class="mb-0" id="chatName">John Doe</h6>
+                <small class="text-muted" id="statusText">online</small>
+                <div class="typing-indicator" id="typingIndicator">typing...</div>
+              </div>
+            </div>
+            <div>
+              <button class="btn btn-link text-muted p-2">
+                <i class="fas fa-video"></i>
+              </button>
+              <button class="btn btn-link text-muted p-2">
+                <i class="fas fa-phone"></i>
+              </button>
+              <button class="btn btn-link text-muted p-2">
+                <i class="fas fa-search"></i>
+              </button>
+              <button class="btn btn-link text-muted p-2">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div class="chat-messages d-none" id="chatMessages">
+        </div>
+
+        <!-- Message Input -->
+        <div class="message-input-container d-none" id="messageInput">
+          <div class="d-flex align-items-end">
+            <button class="emoji-btn" onclick="toggleEmojiPicker()">
+              <i class="far fa-smile"></i>
+            </button>
+            <button class="attachment-btn" onclick="showAttachmentOptions()">
+              <i class="fas fa-paperclip"></i>
+            </button>
+            <textarea class="form-control message-input mx-2" id="messageTextarea" placeholder="Type a message" rows="1"
+              onkeydown="handleKeyPress(event)" oninput="adjustTextareaHeight(this)"></textarea>
+            <button class="send-btn" onclick="sendMessage()" id="sendButton">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+  <script src="/javascripts/helper.js"></script>
+
+  <script>
+    const token = checkToken()
+
+    const username = getUsername()
+
+    let receiver = '';
+
+    const socket = io();
+
+    let onlineUsers = {}
+
+    socket.emit('user_online', username);
+
+    // Get the initial list of online users
+    socket.on('online_users', (users) => {
+      onlineUsers = users;
+      console.log(onlineUsers)
+      statusOnline()
+    });
+
+    // Listen for when a friend comes online
+    socket.on('friend_online', (users) => {
+      onlineUsers = users
+      console.log(onlineUsers)
+      statusOnline()
+    });
+
+    // Listen for when a friend goes offline
+    socket.on('friend_offline', (users) => {
+      onlineUsers = users
+      console.log(onlineUsers)
+      statusOnline()
+    });
+
+    const statusOnline = () => {
+      if (onlineUsers.hasOwnProperty(receiver)) {
+        document.getElementById('icon-header-status').className = 'online-status'
+        document.getElementById('statusText').innerText = 'online'
+      } else {
+        document.getElementById('icon-header-status').className = 'offline-status'
+        document.getElementById('statusText').innerText = 'offline'
+      }
+      // update status online every our friend
+      document.querySelectorAll('.chat-item').forEach(item => {
+        const usernameId = item.id.slice(10);
+        const statusEl = item.querySelector('.chat-item-icon-status');
+        if (onlineUsers.hasOwnProperty(usernameId)) {
+          statusEl.classList.add('online-status');
+          statusEl.classList.remove('offline-status');
+        } else {
+          statusEl.classList.remove('online-status');
+          statusEl.classList.add('offline-status');
+        }
+      });
+    }
+
+    $(async function () {
+      socket.on('load-chat', async () => {
+        if (receiver)
+          await loadChat()
+        await getFriend()
+        if (receiver)
+          document.getElementById(`chat-item-${receiver}`).classList.add('active');
+      })
+
+      await getFriend()
+    })
+
+    document.getElementById('username').innerHTML = username
+
+    const getFriend = async () => {
+      const data = await $.ajax({
+        method: "GET",
+        url: `http://localhost:3000/users/${username}/friend`,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      let html = ''
+      data.forEach((item, index) => {
+        html += `
+                    <div id="chat-item-${item.username}" class="chat-item" onclick="selectChat('${item.username}')">
+                      <div class="d-flex">
+                        <div class="position-relative me-3">
+                          <div class="avatar">
+                            <i class="fas fa-user"></i>
+                          </div>
+                          <div class="online-status chat-item-icon-status"></div>
+                        </div>
+                        <div class="flex-grow-1">
+                          <div class="d-flex justify-content-between">
+                            <h6 class="mb-1">${item.username}</h6>
+                          ${item.unreadCount > 0 ? `<span class="badge text-bg-warning">${item.unreadCount}</span>` : ''}
+                          </div>
+                          <div class="d-flex justify-content-between">
+                            <p class="mb-0 text-muted small truncate">${item.lastChat?.message || '-'}</p>
+                            <small class="text-muted">2:30 PM</small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    `
+      })
+      $('#chat-list').html(html)
+      statusOnline()
+    }
+
+    const addChat = async (message) => {
+      $.ajax({
+        method: "POST",
+        url: "http://localhost:3000/chats",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        data: { message, sender: username, receiver }
+      }).done(function (data) {
+        socket.emit('add-chat', { receiver })
+      }).fail(function (err) {
+        alert('gagal simpan data')
+      })
+    }
+
+    const loadChat = async () => {
+      const data = await $.ajax({
+        method: "GET",
+        url: `http://localhost:3000/chats/${username}/${receiver}`,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      let html = ''
+      data.forEach((item, index) => {
+        html += `
+                    <div class="message ${item.sender == username ? 'sent' : 'received'}">
+                      <div class="message-bubble">
+                        <p class="mb-0">${item.message}</p>
+                        <div class="message-time">${item.time}</div>
+                      </div>
+                    </div>
+                    `
+      })
+      $('#chatMessages').html(html)
+      scrollToBottom();
+    }
+
+    async function selectChat(chatName) {
+      receiver = chatName;
+      // Update chat header
+      document.getElementById('chatName').textContent = chatName;
+      await loadChat();
+      await getFriend();
+      // Remove active class from all chat items
+      document.querySelectorAll('.chat-item').forEach(item => {
+        item.classList.remove('active');
+      });
+
+      // Add active class to clicked item
+      document.getElementById(`chat-item-${chatName}`).classList.add('active');
+
+      // Hide welcome screen
+      document.getElementById('welcomeScreen').style.display = 'none';
+
+      // Show chat elements
+      document.getElementById('chatHeader').classList.remove('d-none');
+      document.getElementById('chatMessages').classList.remove('d-none');
+      document.getElementById('messageInput').classList.remove('d-none');
+
+      // Focus on message input
+      document.getElementById('messageTextarea').focus();
+
+    }
+
+    function sendMessage() {
+      const textarea = document.getElementById('messageTextarea');
+      const messageText = textarea.value.trim();
+
+      if (messageText === '') return;
+
+      // Create message element
+      const messageContainer = document.createElement('div');
+      messageContainer.className = 'message sent';
+
+      const messageBubble = document.createElement('div');
+      messageBubble.className = 'message-bubble';
+
+      const messageContent = document.createElement('p');
+      messageContent.className = 'mb-0';
+      messageContent.textContent = messageText;
+
+      const messageTime = document.createElement('div');
+      messageTime.className = 'message-time';
+      messageTime.innerHTML = getCurrentTime() + ' ✓✓';
+
+      messageBubble.appendChild(messageContent);
+      messageBubble.appendChild(messageTime);
+      messageContainer.appendChild(messageBubble);
+
+      // Add message to chat
+      document.getElementById('chatMessages').appendChild(messageContainer);
+
+      // Clear input
+      textarea.value = '';
+      adjustTextareaHeight(textarea);
+
+      // Scroll to bottom
+      scrollToBottom();
+
+      addChat(messageText)
+    }
+
+    function handleKeyPress(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      }
+    }
+
+    function adjustTextareaHeight(textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    }
+
+    function getCurrentTime() {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      return hours + ':' + minutes;
+    }
+
+    function scrollToBottom() {
+      const chatMessages = document.getElementById('chatMessages');
+      setTimeout(() => {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }, 100);
+    }
+
+    function simulateResponse() {
+      const responses = [
+        "That sounds great!",
+        "I agree with you.",
+        "Thanks for letting me know.",
+        "Sure, no problem!",
+        "Let me think about it.",
+        "Absolutely!",
+        "I'll get back to you on that.",
+        "Perfect timing!"
+      ];
+
+      // Show typing indicator
+      showTypingIndicator();
+
+      setTimeout(() => {
+        hideTypingIndicator();
+
+        // Create response message
+        const messageContainer = document.createElement('div');
+        messageContainer.className = 'message received';
+
+        const messageBubble = document.createElement('div');
+        messageBubble.className = 'message-bubble';
+
+        const messageContent = document.createElement('p');
+        messageContent.className = 'mb-0';
+        messageContent.textContent = responses[Math.floor(Math.random() * responses.length)];
+
+        const messageTime = document.createElement('div');
+        messageTime.className = 'message-time';
+        messageTime.textContent = getCurrentTime();
+
+        messageBubble.appendChild(messageContent);
+        messageBubble.appendChild(messageTime);
+        messageContainer.appendChild(messageBubble);
+
+        // Add message to chat
+        document.getElementById('chatMessages').appendChild(messageContainer);
+
+        // Scroll to bottom
+        scrollToBottom();
+      }, 2000);
+    }
+
+    function showTypingIndicator() {
+      document.getElementById('statusText').style.display = 'none';
+      document.getElementById('typingIndicator').style.display = 'block';
+    }
+
+    function hideTypingIndicator() {
+      document.getElementById('statusText').style.display = 'block';
+      document.getElementById('typingIndicator').style.display = 'none';
+    }
+
+    function toggleEmojiPicker() {
+      // Simple emoji insertion - in a real app, you'd use an emoji picker library
+      const emojis = ['😀', '😂', '😍', '🤔', '👍', '👎', '❤️', '🎉', '🔥', '💯'];
+      const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+
+      const textarea = document.getElementById('messageTextarea');
+      textarea.value += randomEmoji;
+      textarea.focus();
+      adjustTextareaHeight(textarea);
+    }
+
+    function showAttachmentOptions() {
+      alert('Attachment feature coming soon! You can add photos, documents, camera, location, etc.');
+    }
+
+    // Auto-resize textarea on page load
+    document.addEventListener('DOMContentLoaded', function () {
+      const textarea = document.getElementById('messageTextarea');
+      if (textarea) {
+        adjustTextareaHeight(textarea);
+      }
+    });
+
+    // Search functionality
+    document.querySelector('.search-box').addEventListener('input', function (e) {
+      const searchTerm = e.target.value.toLowerCase();
+      const chatItems = document.querySelectorAll('.chat-item');
+
+      chatItems.forEach(item => {
+        const chatName = item.querySelector('h6').textContent.toLowerCase();
+        const lastMessage = item.querySelector('p').textContent.toLowerCase();
+
+        if (chatName.includes(searchTerm) || lastMessage.includes(searchTerm)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

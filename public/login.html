@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <title>Login</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header text-center">
+                <h1>Login</h1>
+            </div>
+            <div class="card-body">
+                <form id="form">
+                    <div class="row mb-3">
+                        <label for="username" class="col-sm-2 col-form-label">Username</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="username">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="password" class="col-sm-2 col-form-label">Password</label>
+                        <div class="col-sm-10">
+                            <input type="password" class="form-control" id="password">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                <p>doesn't have a account? please <a href="/register.html">Register</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('form').addEventListener('submit', async function (e) {
+            e.preventDefault()
+            const username = document.getElementById('username').value
+            const password = document.getElementById('password').value
+
+            const response = await fetch("http://localhost:3000/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json()
+
+            if (data.token) {
+                localStorage.setItem('token', data.token)
+                localStorage.setItem('username', data.username)
+                window.location.replace('/')
+            } else {
+                alert(data.message)
+            }
+        })
+    </script>
+</body>
+
+</html>
