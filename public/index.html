@@ -458,7 +458,7 @@
     const getFriend = async () => {
       const data = await $.ajax({
         method: "GET",
-        url: `http://localhost:3000/users/${username}/friend`,
+        url: `/users/${username}/friend`,
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -495,7 +495,7 @@
     const addChat = async (message) => {
       $.ajax({
         method: "POST",
-        url: "http://localhost:3000/chats",
+        url: "/chats",
         headers: {
           Authorization: `Bearer ${token}`
         },
@@ -510,7 +510,7 @@
     const loadChat = async () => {
       const data = await $.ajax({
         method: "GET",
-        url: `http://localhost:3000/chats/${username}/${receiver}`,
+        url: `/chats/${username}/${receiver}`,
         headers: {
           Authorization: `Bearer ${token}`
         }

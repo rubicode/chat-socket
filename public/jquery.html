@@ -78,7 +78,7 @@
         const getData = async () => {
             $.ajax({
                 method: "GET",
-                url: "http://localhost:3000/users",
+                url: "/users",
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -108,7 +108,7 @@
 
             $.ajax({
                 method: id ? "PUT" : "POST",
-                url: id ? `http://localhost:3000/users/${id}` : "http://localhost:3000/users",
+                url: id ? `/users/${id}` : "/users",
                 data: { username, address }
             }).done(function (data) {
                 $('#id').val('')
@@ -123,7 +123,7 @@
         const deleteData = async (id) => {
             $.ajax({
                 method: "DELETE",
-                url: `http://localhost:3000/users/${id}`
+                url: `/users/${id}`
             }).done(function (data) {
                 getData()
                 socket.emit('refresh-data')
@@ -133,7 +133,7 @@
         const editData = async (id) => {
             $.ajax({
                 method: "GET",
-                url: `http://localhost:3000/users/${id}`
+                url: `/users/${id}`
             }).done(function (data) {
                 $('#id').val(data._id)
                 $('#username').val(data.username)
